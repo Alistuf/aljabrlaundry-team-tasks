@@ -1,0 +1,134 @@
+{
+  "project_name": "Aljabr Branch Management System",
+  "design_philosophy": {
+    "theme": "light",
+    "direction": "rtl",
+    "tone": "Professional, Efficient, Trustworthy",
+    "core_principle": "Mobile-First Field Operations"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Cairo, sans-serif",
+      "body": "Tajawal, sans-serif"
+    },
+    "weights": {
+      "regular": 400,
+      "medium": 500,
+      "bold": 700
+    },
+    "scale": {
+      "h1": "text-2xl md:text-3xl font-bold tracking-tight",
+      "h2": "text-xl md:text-2xl font-bold",
+      "h3": "text-lg md:text-xl font-semibold",
+      "body": "text-base leading-relaxed",
+      "caption": "text-sm text-gray-500"
+    },
+    "google_fonts_url": "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700&family=Tajawal:wght@400;500;700&display=swap"
+  },
+  "colors": {
+    "primary": {
+      "DEFAULT": "#0066CC",
+      "foreground": "#FFFFFF",
+      "hover": "#0052A3",
+      "active": "#003D7A"
+    },
+    "secondary": {
+      "DEFAULT": "#E31837",
+      "foreground": "#FFFFFF",
+      "hover": "#C4122C"
+    },
+    "background": {
+      "page": "#F8F9FA",
+      "card": "#FFFFFF",
+      "input": "#FFFFFF"
+    },
+    "text": {
+      "primary": "#111827",
+      "secondary": "#4B5563",
+      "tertiary": "#9CA3AF"
+    },
+    "border": {
+      "DEFAULT": "#E5E7EB",
+      "focus": "#0066CC"
+    },
+    "status": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "info": "#3B82F6"
+    }
+  },
+  "layout": {
+    "container": "container mx-auto px-4 max-w-7xl",
+    "mobile_container": "max-w-md mx-auto w-full",
+    "grid_dashboard": "grid grid-cols-1 lg:grid-cols-4 gap-6",
+    "sidebar": "hidden lg:flex flex-col w-64 bg-white border-e h-screen sticky top-0",
+    "spacing": {
+      "section": "py-8 md:py-12",
+      "card_padding": "p-6",
+      "element_gap": "gap-4"
+    }
+  },
+  "components": {
+    "buttons": {
+      "base": "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      "sizes": {
+        "default": "h-11 px-4 py-2",
+        "sm": "h-9 rounded-md px-3",
+        "lg": "h-12 rounded-md px-8",
+        "icon": "h-10 w-10"
+      },
+      "variants": {
+        "primary": "bg-[#0066CC] text-white hover:bg-[#0052A3]",
+        "destructive": "bg-[#E31837] text-white hover:bg-[#C4122C]",
+        "outline": "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        "ghost": "hover:bg-accent hover:text-accent-foreground"
+      }
+    },
+    "cards": {
+      "base": "rounded-xl border bg-card text-card-foreground shadow-sm",
+      "hover_effect": "hover:shadow-md transition-shadow duration-200"
+    },
+    "inputs": {
+      "base": "flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0066CC] disabled:cursor-not-allowed disabled:opacity-50 text-right dir-rtl"
+    }
+  },
+  "assets": {
+    "logo": "https://customer-assets.emergentagent.com/job_3367f2a2-798d-4b61-99bb-befe08ab3864/artifacts/8ejiuqqy_Aljabr-Laundry-Main-Logo-.png",
+    "images": {
+      "landing_edit_branch": "https://images.unsplash.com/photo-1569536013655-0c62cecf2618?auto=format&fit=crop&w=800&q=80",
+      "landing_new_branch": "https://images.unsplash.com/photo-1640631005057-de521cfcd36e?auto=format&fit=crop&w=800&q=80",
+      "placeholder_map": "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?auto=format&fit=crop&w=800&q=80"
+    }
+  },
+  "rtl_guidelines": {
+    "general": "Ensure 'dir=\"rtl\"' is set on the html or body tag.",
+    "tailwind_classes": {
+      "margin_start": "ms-",
+      "margin_end": "me-",
+      "padding_start": "ps-",
+      "padding_end": "pe-",
+      "border_start": "border-s-",
+      "border_end": "border-e-",
+      "text_align": "text-right"
+    },
+    "icons": "Use lucide-react icons. For directional icons (arrow-left, chevron-right), check if they need manual flipping or if the RTL context handles them (usually needs check). For this project, assume icons need to be culturally appropriate (e.g., back arrow points right in RTL). Use 'transform scale-x-[-1]' for directional icons if needed."
+  },
+  "accessibility": {
+    "focus_ring": "ring-2 ring-offset-2 ring-[#0066CC]",
+    "contrast": "Ensure text contrast ratio of 4.5:1 against background.",
+    "labels": "All form inputs must have visible labels."
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'lucide-react' and 'clsx' 'tailwind-merge' if not present.",
+    "2. FONTS: Add the Google Fonts link for Cairo and Tajawal to the index.html head.",
+    "3. TAILWIND: Update tailwind.config.js to include the custom colors (primary: #0066CC, secondary: #E31837) and fonts (sans: ['Tajawal', ...]).",
+    "4. RTL: Add 'dir=\"rtl\"' to the root div or body in index.html.",
+    "5. COMPONENTS: Use shadcn/ui patterns but style them manually or use the provided base classes if shadcn is not fully installed. Prioritize the 'mobile-first' experience for the forms.",
+    "6. LANGUAGE: All UI text (buttons, labels, headings) should be in Arabic. Use English for code/variable names only.",
+    "7. IMAGES: Use the provided Unsplash URLs for the landing page cards.",
+    "8. MAPS: For 'Copy Google Maps Link', use a simple button with a 'MapPin' icon. Do not implement a full interactive map unless requested (keep it simple for MVP).",
+    "9. ICONS: Use Lucide icons. 'MapPin' for location, 'Plus' for add, 'Upload' for photos, 'Check' for success.",
+    "10. ARABIC_TEXT_EXAMPLES: { 'Edit Branch': 'تعديل بيانات الفرع', 'New Branch': 'طلب إضافة فرع جديد', 'Branch Name': 'اسم الفرع', 'City': 'المدينة', 'Phone': 'رقم الهاتف', 'Submit': 'إرسال الطلب' }"
+  ]
+}
