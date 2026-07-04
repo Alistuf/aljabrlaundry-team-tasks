@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { 
   LogOut, Bell, Search, MapPin, Plus, Users, UserPlus, Settings,
   Clock, CheckCircle2, Loader2, RefreshCw, Eye, Shield, User, Trash2, AlertCircle,
-  FileText, GitBranch, ArrowRight
+  FileText, GitBranch, ArrowRight, ArrowLeft, ChevronDown, TrendingUp, MoreHorizontal, Filter
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth, ROLE_MANAGER, ROLE_SUPERVISOR } from '@/context/AuthContext';
@@ -306,29 +306,35 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="ltr">
+    <div className="app-shell" dir="ltr">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-20">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <img 
-                src={LOGO_URL} 
-                alt="Aljabr Laundry" 
-                className="h-10 object-contain"
-              />
+      <header className="app-topbar">
+        <div className="app-topbar-inner">
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-6">
+              <button type="button" onClick={() => navigate('/')} className="icon-btn-soft" aria-label="Back to home">
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+              <Link to="/" aria-label="Go to home page">
+                <img 
+                  src={LOGO_URL} 
+                  alt="Aljabr Laundry" 
+                  className="app-logo"
+                />
+              </Link>
+              <div className="hidden h-12 w-px bg-slate-200 md:block" />
               <div className="hidden md:block">
-                <h1 className="font-heading font-bold text-gray-900">Dashboard</h1>
-                <p className="text-xs text-gray-500">Branch Management System</p>
+                <h1 className="font-heading text-2xl font-extrabold text-slate-950">Dashboard</h1>
+                <p className="text-base text-slate-400">Branch Management System</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-6">
               {/* Role Badge */}
               <Badge 
-                className={`hidden md:flex items-center gap-1 ${isManager ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}
+                className="hidden rounded-full border border-blue-200 bg-blue-50 px-6 py-3 text-base font-semibold text-blue-700 hover:bg-blue-50 md:flex"
               >
-                {isManager ? <Shield className="w-3 h-3" /> : <User className="w-3 h-3" />}
+                <span className="h-3 w-3 rounded-full bg-blue-600" />
                 {isManager ? 'Manager' : 'Supervisor'}
               </Badge>
 
@@ -338,25 +344,25 @@ export default function AdminDashboard() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative"
+                  className="relative h-12 w-12 rounded-full text-slate-600 hover:bg-slate-100"
                   data-testid="notifications-btn"
                 >
-                  <Bell className="w-5 h-5" />
+                  <Bell className="h-6 w-6" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-secondary text-white text-xs rounded-full flex items-center justify-center">
+                    <span className="absolute right-2 top-2 h-3 w-3 rounded-full bg-red-500 text-[0]">
                       {unreadCount}
                     </span>
                   )}
                 </Button>
                 
                 {showNotifications && (
-                  <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-xl border z-30 animate-fade-in">
-                    <div className="p-4 border-b flex items-center justify-between">
-                      <h3 className="font-semibold">Notifications</h3>
+                  <div className="absolute right-0 top-14 z-30 w-[420px] overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_18px_40px_rgba(15,23,42,0.16)] animate-fade-in">
+                    <div className="flex items-center justify-between border-b border-slate-100 px-8 py-7">
+                      <h3 className="text-3xl font-semibold text-slate-950">Notifications</h3>
                       {unreadCount > 0 && (
                         <button 
                           onClick={markAllRead}
-                          className="text-xs text-primary hover:underline"
+                          className="text-xl font-medium text-blue-600 hover:underline"
                         >
                           Mark all as read
                         </button>
@@ -371,10 +377,15 @@ export default function AdminDashboard() {
                             key={notif.id}
                             to={`/admin/requests/${notif.request_id}`}
                             onClick={() => setShowNotifications(false)}
-                            className={`block p-4 border-b hover:bg-gray-50 transition-colors ${!notif.is_read ? 'bg-blue-50' : ''}`}
+                            className={`block border-b border-slate-100 px-8 py-7 transition-colors hover:bg-slate-50 ${!notif.is_read ? 'bg-slate-50' : ''}`}
                           >
-                            <p className="text-sm font-medium">{notif.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">{formatDate(notif.created_at)}</p>
+                            <div className="flex gap-5">
+                              {!notif.is_read && <span className="mt-2 h-4 w-4 shrink-0 rounded-full bg-blue-500" />}
+                              <div>
+                                <p className="text-xl font-medium text-slate-950">{notif.message}</p>
+                                <p className="mt-3 text-lg text-slate-400">{formatDate(notif.created_at)}</p>
+                              </div>
+                            </div>
                           </Link>
                         ))
                       )}
@@ -386,20 +397,21 @@ export default function AdminDashboard() {
               {/* User Info Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
+                  <Button variant="ghost" className="flex h-14 items-center gap-4 rounded-full px-2 hover:bg-slate-50">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white">
+                      {(user?.name || user?.username || 'MA').split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
-                    <span className="hidden md:inline text-sm">{user?.name || user?.username}</span>
+                    <span className="hidden text-xl font-medium text-slate-700 md:inline">{user?.name || user?.username}</span>
+                    <ChevronDown className="hidden h-5 w-5 text-slate-400 md:block" />
                     {!user?.email_verified && (
                       <AlertCircle className="w-4 h-4 text-yellow-500" />
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="px-3 py-2">
-                    <p className="font-medium">{user?.name || user?.username}</p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
+                <DropdownMenuContent align="end" className="w-80 overflow-hidden rounded-[24px] border-slate-200 p-0 shadow-[0_18px_40px_rgba(15,23,42,0.14)]">
+                  <div className="border-b border-slate-100 px-8 py-6">
+                    <p className="text-2xl font-semibold text-slate-950">{user?.name || user?.username}</p>
+                    <p className="mt-2 text-xl text-slate-400">{user?.email}</p>
                     {!user?.email_verified && (
                       <Badge className="mt-1 bg-yellow-100 text-yellow-800 text-xs">
                         Email not verified
@@ -408,18 +420,26 @@ export default function AdminDashboard() {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/admin/profile" className="flex items-center gap-2 cursor-pointer">
-                      <Settings className="w-4 h-4" />
-                      Profile Settings
+                    <Link to="/admin/profile" className="flex cursor-pointer items-center gap-5 px-8 py-5 text-xl">
+                      <User className="h-6 w-6 text-blue-600" />
+                      Profile
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex cursor-pointer items-center gap-5 px-8 py-5 text-xl">
+                    <Settings className="h-6 w-6 text-slate-500" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex cursor-pointer items-center gap-5 px-8 py-5 text-xl">
+                    <Bell className="h-6 w-6 text-amber-500" />
+                    Notifications
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleLogout}
-                    className="text-red-600 cursor-pointer"
+                    className="flex cursor-pointer items-center gap-5 px-8 py-5 text-xl text-red-600"
                   >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    <LogOut className="h-6 w-6" />
+                    Sign Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -429,24 +449,24 @@ export default function AdminDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
+      <main className="mx-auto max-w-none px-10 py-10">
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="mb-10 inline-flex flex-wrap gap-2 rounded-[26px] border border-slate-200 bg-white p-3 shadow-[0_8px_18px_rgba(15,23,42,0.07)]">
           <Button
             variant={activeTab === 'requests' ? 'default' : 'outline'}
             onClick={() => setActiveTab('requests')}
-            className="gap-2"
+            className={`h-14 rounded-[18px] px-7 text-xl font-semibold shadow-none ${activeTab === 'requests' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-transparent bg-white text-slate-500 hover:bg-slate-50'}`}
           >
-            <MapPin className="w-4 h-4" />
+            <MapPin className="h-6 w-6" />
             Requests
           </Button>
           <Button
             variant={activeTab === 'workflow' ? 'default' : 'outline'}
             onClick={() => setActiveTab('workflow')}
-            className="gap-2"
+            className={`h-14 rounded-[18px] px-7 text-xl font-semibold shadow-none ${activeTab === 'workflow' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-transparent bg-white text-slate-500 hover:bg-slate-50'}`}
             data-testid="workflow-tab-btn"
           >
-            <GitBranch className="w-4 h-4" />
+            <GitBranch className="h-6 w-6" />
             Workflow Requests
             {workflowStats.pending + workflowStats.in_progress > 0 && (
               <Badge className="bg-indigo-100 text-indigo-800 ml-1">
@@ -459,17 +479,17 @@ export default function AdminDashboard() {
               <Button
                 variant={activeTab === 'team' ? 'default' : 'outline'}
                 onClick={() => setActiveTab('team')}
-                className="gap-2"
+                className={`h-14 rounded-[18px] px-7 text-xl font-semibold shadow-none ${activeTab === 'team' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'border-transparent bg-white text-slate-500 hover:bg-slate-50'}`}
               >
-                <Users className="w-4 h-4" />
+                <Users className="h-6 w-6" />
                 Team Management
               </Button>
               <Button
                 variant={activeTab === 'request-types' ? 'default' : 'ghost'}
                 onClick={() => navigate('/admin/request-types')}
-                className="gap-2"
+                className="h-14 rounded-[18px] border-transparent bg-white px-7 text-xl font-semibold text-slate-500 shadow-none hover:bg-slate-50"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="h-6 w-6" />
                 Request Types
               </Button>
             </>
@@ -477,29 +497,42 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <Card className="bg-white">
-            <CardContent className="p-4">
-              <p className="text-2xl md:text-3xl font-bold text-gray-900">{stats.total}</p>
-              <p className="text-sm text-gray-500">Total Requests</p>
+        <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-4">
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">Total Requests</p>
+                <TrendingUp className="h-7 w-7 text-slate-300" />
+              </div>
+              <p className="text-5xl font-extrabold text-slate-950">{stats.total}</p>
             </CardContent>
           </Card>
-          <Card className="bg-blue-50 border-blue-100">
-            <CardContent className="p-4">
-              <p className="text-2xl md:text-3xl font-bold text-blue-700">{stats.new}</p>
-              <p className="text-sm text-blue-600">New Requests</p>
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">New Requests</p>
+                <TrendingUp className="h-7 w-7 text-blue-200" />
+              </div>
+              <p className="text-5xl font-extrabold text-blue-600">{stats.new}</p>
+              <p className="mt-4 text-base text-slate-400">Awaiting review</p>
             </CardContent>
           </Card>
-          <Card className="bg-yellow-50 border-yellow-100">
-            <CardContent className="p-4">
-              <p className="text-2xl md:text-3xl font-bold text-yellow-700">{stats.in_progress}</p>
-              <p className="text-sm text-yellow-600">In Progress</p>
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">In Progress</p>
+                <TrendingUp className="h-7 w-7 text-orange-200" />
+              </div>
+              <p className="text-5xl font-extrabold text-orange-500">{stats.in_progress}</p>
             </CardContent>
           </Card>
-          <Card className="bg-green-50 border-green-100">
-            <CardContent className="p-4">
-              <p className="text-2xl md:text-3xl font-bold text-green-700">{stats.completed}</p>
-              <p className="text-sm text-green-600">Completed</p>
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">Completed</p>
+                <TrendingUp className="h-7 w-7 text-emerald-200" />
+              </div>
+              <p className="text-5xl font-extrabold text-emerald-600">{stats.completed}</p>
             </CardContent>
           </Card>
         </div>
@@ -507,8 +540,8 @@ export default function AdminDashboard() {
         {activeTab === 'requests' && (
           <>
             {/* Filters Section */}
-            <Card className="mb-6">
-              <CardContent className="p-4">
+            <Card className="mb-8 rounded-[24px] border-slate-200 bg-white shadow-[0_8px_18px_rgba(15,23,42,0.06)] md:hidden">
+              <CardContent className="p-6">
                 <div className="flex flex-wrap items-center gap-4">
                   {/* Search */}
                   <div className="flex-1 min-w-[200px]">
@@ -518,7 +551,7 @@ export default function AdminDashboard() {
                         placeholder="Search by branch name..."
                         value={filters.search}
                         onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                        className="pl-10"
+                        className="h-14 rounded-[18px] border-slate-200 bg-slate-50 pl-12 text-lg"
                         data-testid="search-input"
                       />
                     </div>
@@ -530,7 +563,7 @@ export default function AdminDashboard() {
                       value={filters.city} 
                       onValueChange={(value) => setFilters({ ...filters, city: value === "all" ? "" : value })}
                     >
-                      <SelectTrigger data-testid="city-filter">
+                      <SelectTrigger className="h-14 rounded-[18px] border-slate-200 bg-slate-50 text-lg" data-testid="city-filter">
                         <SelectValue placeholder="Filter by City" />
                       </SelectTrigger>
                       <SelectContent>
@@ -550,7 +583,7 @@ export default function AdminDashboard() {
                       value={filters.status} 
                       onValueChange={(value) => setFilters({ ...filters, status: value === "all" ? "" : value })}
                     >
-                      <SelectTrigger data-testid="status-filter">
+                      <SelectTrigger className="h-14 rounded-[18px] border-slate-200 bg-slate-50 text-lg" data-testid="status-filter">
                         <SelectValue placeholder="Filter by Status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -568,6 +601,7 @@ export default function AdminDashboard() {
                       variant="outline"
                       size="icon"
                       onClick={fetchData}
+                      className="h-14 w-14 rounded-[16px] border-slate-200"
                       data-testid="refresh-btn"
                     >
                       <RefreshCw className="w-4 h-4" />
@@ -588,12 +622,30 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Requests Table */}
-            <Card>
-              <CardHeader className="pb-2">
+            <Card className="modern-table-card">
+              <CardHeader className="border-b border-slate-100 px-8 py-7">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-heading">
+                  <CardTitle className="font-heading text-3xl font-extrabold text-slate-950">
                     {isManager ? 'All Branch Requests' : 'My Assigned Requests'}
                   </CardTitle>
+                  <div className="hidden items-center gap-4 md:flex">
+                    <div className="relative">
+                      <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                      <Input
+                        placeholder="Search by branch name..."
+                        value={filters.search}
+                        onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                        className="h-14 w-[420px] rounded-[18px] border-slate-200 bg-slate-50 pl-14 text-lg"
+                      />
+                    </div>
+                    <Button variant="outline" className="h-14 rounded-[16px] border-slate-200 px-6 text-lg">
+                      <Filter className="mr-2 h-5 w-5" />
+                      Filter
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={fetchData} className="h-14 w-14 rounded-[16px] border-slate-200">
+                      <RefreshCw className="h-5 w-5" />
+                    </Button>
+                  </div>
                   {isManager && selectedRequests.length > 0 && (
                     <Button
                       variant="destructive"
@@ -608,7 +660,7 @@ export default function AdminDashboard() {
                   )}
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -626,9 +678,9 @@ export default function AdminDashboard() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b bg-gray-50">
+                        <tr className="border-b border-slate-100 bg-slate-50">
                           {isManager && (
-                            <th className="text-left py-3 px-4 font-medium text-gray-600 w-12">
+                            <th className="w-12 px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">
                               <Checkbox
                                 checked={selectedRequests.length === requests.length && requests.length > 0}
                                 onCheckedChange={toggleSelectAllRequests}
@@ -636,27 +688,27 @@ export default function AdminDashboard() {
                               />
                             </th>
                           )}
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Request Type</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Branch Name</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 hidden md:table-cell">City</th>
+                          <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Request Type</th>
+                          <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Branch Name</th>
+                          <th className="hidden px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500 md:table-cell">City</th>
                           {isManager && (
-                            <th className="text-left py-3 px-4 font-medium text-gray-600 hidden lg:table-cell">Assigned To</th>
+                            <th className="hidden px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500 lg:table-cell">Assigned To</th>
                           )}
-                          <th className="text-left py-3 px-4 font-medium text-gray-600 hidden lg:table-cell">Date</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Status</th>
-                          <th className="text-left py-3 px-4 font-medium text-gray-600">Action</th>
+                          <th className="hidden px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500 lg:table-cell">Date</th>
+                          <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Status</th>
+                          <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {requests.map((request) => {
-                          const typeInfo = REQUEST_TYPE_MAP[request.request_type];
-                          const statusInfo = STATUS_MAP[request.status];
+                          const typeInfo = REQUEST_TYPE_MAP[request.request_type] || REQUEST_TYPE_MAP.dynamic;
+                          const statusInfo = STATUS_MAP[request.status] || STATUS_MAP.new;
                           const StatusIcon = statusInfo.icon;
                           
                           return (
-                            <tr key={request.id} className={`border-b hover:bg-gray-50 transition-colors ${selectedRequests.includes(request.id) ? 'bg-blue-50' : ''}`}>
+                            <tr key={request.id} className={`border-b border-slate-100 transition-colors hover:bg-slate-50 ${selectedRequests.includes(request.id) ? 'bg-blue-50' : ''}`}>
                               {isManager && (
-                                <td className="py-3 px-4">
+                                <td className="px-8 py-7">
                                   <Checkbox
                                     checked={selectedRequests.includes(request.id)}
                                     onCheckedChange={() => toggleRequestSelection(request.id)}
@@ -664,36 +716,36 @@ export default function AdminDashboard() {
                                   />
                                 </td>
                               )}
-                              <td className="py-3 px-4">
-                                <Badge variant="outline" className={typeInfo.color}>
+                              <td className="px-8 py-7">
+                                <Badge variant="outline" className={`${typeInfo.color} rounded-full border-0 px-5 py-2 text-base font-bold`}>
                                   {typeInfo.label}
                                 </Badge>
                               </td>
-                              <td className="py-3 px-4 font-medium">{request.branch_name}</td>
-                              <td className="py-3 px-4 hidden md:table-cell text-gray-600">{request.city}</td>
+                              <td className="px-8 py-7 text-xl font-semibold text-slate-950">{request.branch_name}</td>
+                              <td className="hidden px-8 py-7 text-xl text-slate-500 md:table-cell">{request.city}</td>
                               {isManager && (
-                                <td className="py-3 px-4 hidden lg:table-cell text-gray-600">
+                                <td className="hidden px-8 py-7 text-xl text-slate-500 lg:table-cell">
                                   {request.assigned_to_name || (
                                     <span className="text-gray-400 italic">Unassigned</span>
                                   )}
                                 </td>
                               )}
-                              <td className="py-3 px-4 hidden lg:table-cell text-gray-500 text-sm">
+                              <td className="hidden px-8 py-7 text-lg text-slate-400 lg:table-cell">
                                 {formatDate(request.created_at)}
                               </td>
-                              <td className="py-3 px-4">
-                                <Badge className={`${statusInfo.color} flex items-center gap-1 w-fit`}>
-                                  <StatusIcon className="w-3 h-3" />
+                              <td className="px-8 py-7">
+                                <Badge className={`${statusInfo.color} flex w-fit items-center gap-2 rounded-full px-5 py-2 text-base font-semibold`}>
+                                  <StatusIcon className="h-3 w-3" />
                                   {statusInfo.label}
                                 </Badge>
                               </td>
-                              <td className="py-3 px-4">
+                              <td className="px-8 py-7">
                                 <div className="flex items-center gap-2">
                                   <Link to={`/admin/requests/${request.id}`}>
                                     <Button 
                                       variant="outline" 
                                       size="sm"
-                                      className="gap-1"
+                                      className="h-11 rounded-[14px] border-slate-200"
                                       data-testid={`view-request-${request.id}`}
                                     >
                                       <Eye className="w-4 h-4" />
@@ -704,7 +756,7 @@ export default function AdminDashboard() {
                                     <Button 
                                       variant="outline" 
                                       size="sm"
-                                      className="text-red-600 hover:bg-red-50 gap-1"
+                                      className="h-11 rounded-[14px] border-slate-200 text-red-600 hover:bg-red-50"
                                       onClick={() => deleteRequest(request.id)}
                                       data-testid={`delete-request-${request.id}`}
                                     >
@@ -728,59 +780,53 @@ export default function AdminDashboard() {
         {activeTab === 'workflow' && (
           <>
             {/* Workflow Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-              <Card className="bg-white">
-                <CardContent className="p-4">
-                  <p className="text-2xl font-bold text-gray-900">{workflowStats.total}</p>
-                  <p className="text-sm text-gray-500">Total</p>
+            <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-4">
+              <Card className="metric-card">
+                <CardContent className="p-0">
+                  <p className="mb-6 text-xl text-slate-500">Total</p>
+                  <p className="text-5xl font-extrabold text-slate-950">{workflowStats.total}</p>
                 </CardContent>
               </Card>
-              <Card className="bg-amber-50 border-amber-100">
-                <CardContent className="p-4">
-                  <p className="text-2xl font-bold text-amber-700">{workflowStats.pending}</p>
-                  <p className="text-sm text-amber-600">Pending</p>
+              <Card className="metric-card">
+                <CardContent className="p-0">
+                  <p className="mb-6 text-xl text-slate-500">Pending</p>
+                  <p className="text-5xl font-extrabold text-orange-500">{workflowStats.pending}</p>
                 </CardContent>
               </Card>
-              <Card className="bg-blue-50 border-blue-100">
-                <CardContent className="p-4">
-                  <p className="text-2xl font-bold text-blue-700">{workflowStats.in_progress}</p>
-                  <p className="text-sm text-blue-600">In Progress</p>
+              <Card className="metric-card">
+                <CardContent className="p-0">
+                  <p className="mb-6 text-xl text-slate-500">In Progress</p>
+                  <p className="text-5xl font-extrabold text-blue-600">{workflowStats.in_progress}</p>
                 </CardContent>
               </Card>
-              <Card className="bg-green-50 border-green-100">
-                <CardContent className="p-4">
-                  <p className="text-2xl font-bold text-green-700">{workflowStats.completed}</p>
-                  <p className="text-sm text-green-600">Completed</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-red-50 border-red-100">
-                <CardContent className="p-4">
-                  <p className="text-2xl font-bold text-red-700">{workflowStats.cancelled}</p>
-                  <p className="text-sm text-red-600">Cancelled</p>
+              <Card className="metric-card">
+                <CardContent className="p-0">
+                  <p className="mb-6 text-xl text-slate-500">Completed</p>
+                  <p className="text-5xl font-extrabold text-emerald-600">{workflowStats.completed}</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Workflow Requests Table */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-heading flex items-center gap-2">
-                  <GitBranch className="w-5 h-5 text-indigo-600" />
+            <Card className="modern-table-card">
+              <CardHeader className="border-b border-slate-100 px-8 py-7">
+                <CardTitle className="font-heading flex items-center gap-3 text-3xl font-extrabold text-slate-950">
+                  <GitBranch className="h-7 w-7 text-slate-500" />
                   Workflow Requests
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
                   </div>
                 ) : workflowRequests.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <GitBranch className="w-8 h-8 text-gray-400" />
+                  <div className="flex min-h-[430px] flex-col items-center justify-center text-center">
+                    <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
+                      <GitBranch className="h-10 w-10 text-slate-400" />
                     </div>
-                    <p className="text-gray-500">No workflow requests yet</p>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-2xl font-medium text-slate-700">No workflow requests yet</p>
+                    <p className="mt-3 text-xl text-slate-400">
                       Requests with workflow steps will appear here
                     </p>
                   </div>
@@ -864,11 +910,11 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'team' && isManager && (
-          <Card>
-            <CardHeader className="pb-2">
+          <Card className="modern-table-card">
+            <CardHeader className="border-b border-slate-100 px-8 py-7">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-heading flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+                <CardTitle className="font-heading flex items-center gap-3 text-3xl font-extrabold text-slate-950">
+                  <Users className="h-7 w-7 text-slate-500" />
                   Team Members ({teamMembers.length})
                 </CardTitle>
                 <div className="flex gap-2">
@@ -886,16 +932,16 @@ export default function AdminDashboard() {
                   )}
                   <Button
                     onClick={() => setShowAddMemberDialog(true)}
-                    className="gap-2 bg-primary hover:bg-primary-hover"
+                    className="h-14 rounded-[18px] bg-blue-600 px-8 text-lg font-semibold text-white shadow-[0_10px_20px_rgba(37,99,235,0.22)] hover:bg-blue-700"
                     data-testid="add-member-btn"
                   >
-                    <UserPlus className="w-4 h-4" />
+                    <UserPlus className="h-5 w-5" />
                     Add Member
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               {teamMembers.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -912,27 +958,27 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b bg-gray-50">
-                        <th className="text-left py-3 px-4 font-medium text-gray-600 w-12">
+                    <table className="w-full">
+                      <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50">
+                        <th className="w-12 px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">
                           <Checkbox
                             checked={selectedMembers.length === teamMembers.filter(m => m.id !== user?.id).length && teamMembers.length > 1}
                             onCheckedChange={toggleSelectAll}
                             data-testid="select-all-checkbox"
                           />
                         </th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Username</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Email</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Role</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Department</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-600">Actions</th>
+                        <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Username</th>
+                        <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Email</th>
+                        <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Role</th>
+                        <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Department</th>
+                        <th className="px-8 py-5 text-left font-bold uppercase tracking-wide text-slate-500">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {teamMembers.map((member) => (
-                        <tr key={member.id} className={`border-b hover:bg-gray-50 transition-colors ${selectedMembers.includes(member.id) ? 'bg-blue-50' : ''}`}>
-                          <td className="py-3 px-4">
+                        <tr key={member.id} className={`border-b border-slate-100 transition-colors hover:bg-slate-50 ${selectedMembers.includes(member.id) ? 'bg-blue-50' : ''}`}>
+                          <td className="px-8 py-7">
                             {member.id !== user?.id && (
                               <Checkbox
                                 checked={selectedMembers.includes(member.id)}
@@ -941,33 +987,38 @@ export default function AdminDashboard() {
                               />
                             )}
                           </td>
-                          <td className="py-3 px-4 font-medium">
-                            {member.username}
+                          <td className="px-8 py-7 text-xl font-semibold text-slate-950">
+                            <span className="mr-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 font-bold text-white">
+                              {(member.name || member.username || 'M').charAt(0).toUpperCase()}
+                            </span>
+                            {member.name || member.username}
                             {member.id === user?.id && (
                               <Badge className="ml-2 bg-gray-100 text-gray-600">You</Badge>
                             )}
                           </td>
-                          <td className="py-3 px-4 text-gray-600">{member.email}</td>
-                          <td className="py-3 px-4">
-                            <Badge className={member.role === ROLE_MANAGER ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}>
+                          <td className="px-8 py-7 text-xl text-slate-500">{member.email}</td>
+                          <td className="px-8 py-7">
+                            <Badge className={`${member.role === ROLE_MANAGER ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'} rounded-full border-0 px-5 py-2 text-base font-bold`}>
                               {member.role === ROLE_MANAGER ? 'Manager' : 'Supervisor'}
                             </Badge>
                           </td>
-                          <td className="py-3 px-4 text-gray-600 capitalize">
+                          <td className="px-8 py-7 text-xl capitalize text-slate-600">
                             {member.category?.replace('_', ' ') || 'N/A'}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="px-8 py-7">
                             {member.id !== user?.id && (
                               <Button 
                                 variant="outline" 
                                 size="sm"
-                                className="text-red-600 hover:bg-red-50 gap-1"
+                                className="h-11 rounded-[14px] border-slate-200 text-red-600 hover:bg-red-50"
                                 onClick={() => deleteUser(member.id)}
                                 data-testid={`delete-member-${member.id}`}
                               >
-                                <Trash2 className="w-4 h-4" />
-                                Delete
+                                <Trash2 className="h-4 w-4" />
                               </Button>
+                            )}
+                            {member.id === user?.id && (
+                              <MoreHorizontal className="h-6 w-6 text-slate-400" />
                             )}
                           </td>
                         </tr>
@@ -983,91 +1034,97 @@ export default function AdminDashboard() {
 
       {/* Add Member Dialog */}
       <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <UserPlus className="w-5 h-5" />
+        <DialogContent className="overflow-hidden rounded-[28px] border-0 p-0 shadow-[0_26px_70px_rgba(15,23,42,0.24)] sm:max-w-2xl">
+          <DialogHeader className="border-b border-slate-100 px-10 py-8 text-left">
+            <DialogTitle className="font-heading text-3xl font-extrabold text-slate-950">
               Add Team Member
             </DialogTitle>
+            <p className="text-lg text-slate-400">Invite a new member to the team</p>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username *</Label>
+          <div className="space-y-7 px-10 py-8">
+            <div className="space-y-3">
+              <Label htmlFor="username" className="soft-label">Username <span className="text-red-500">*</span></Label>
               <Input
                 id="username"
-                placeholder="Enter username"
+                placeholder="e.g., Ahmed Al-Rashid"
                 value={newMember.username}
                 onChange={(e) => setNewMember({ ...newMember, username: e.target.value })}
+                className="soft-input"
                 data-testid="new-member-username"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email *</Label>
+            <div className="space-y-3">
+              <Label htmlFor="email" className="soft-label">Email <span className="text-red-500">*</span></Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="user@example.com"
+                placeholder="name@aljabrlaundry.com"
                 value={newMember.email}
                 onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
+                className="soft-input"
                 data-testid="new-member-email"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password *</Label>
+            <div className="space-y-3">
+              <Label htmlFor="password" className="soft-label">Password <span className="text-red-500">*</span></Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Enter password"
                 value={newMember.password}
                 onChange={(e) => setNewMember({ ...newMember, password: e.target.value })}
+                className="soft-input"
                 data-testid="new-member-password"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Role *</Label>
-              <Select 
-                value={newMember.role} 
-                onValueChange={(value) => setNewMember({ ...newMember, role: value })}
-              >
-                <SelectTrigger data-testid="new-member-role">
-                  <SelectValue placeholder="Select Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ROLE_MANAGER}>Manager (Full Access)</SelectItem>
-                  <SelectItem value={ROLE_SUPERVISOR}>Supervisor (Assigned Tasks Only)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {newMember.role === ROLE_SUPERVISOR && (
-              <div className="space-y-2">
-                <Label htmlFor="category">Department *</Label>
+            <div className="grid grid-cols-2 gap-5">
+              <div className="space-y-3">
+                <Label htmlFor="role" className="soft-label">Role</Label>
                 <Select 
-                  value={newMember.category} 
-                  onValueChange={(value) => setNewMember({ ...newMember, category: value })}
+                  value={newMember.role} 
+                  onValueChange={(value) => setNewMember({ ...newMember, role: value })}
                 >
-                  <SelectTrigger data-testid="new-member-category">
-                    <SelectValue placeholder="Select Department" />
+                  <SelectTrigger className="soft-input" data-testid="new-member-role">
+                    <SelectValue placeholder="Select Role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="google_maps">Google Maps</SelectItem>
-                    <SelectItem value="marketing">Marketing</SelectItem>
-                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value={ROLE_MANAGER}>Manager</SelectItem>
+                    <SelectItem value={ROLE_SUPERVISOR}>Supervisor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            )}
+              {newMember.role === ROLE_SUPERVISOR && (
+                <div className="space-y-3">
+                  <Label htmlFor="category" className="soft-label">Department</Label>
+                  <Select 
+                    value={newMember.category} 
+                    onValueChange={(value) => setNewMember({ ...newMember, category: value })}
+                  >
+                    <SelectTrigger className="soft-input" data-testid="new-member-category">
+                      <SelectValue placeholder="e.g., Google Maps" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="google_maps">Google Maps</SelectItem>
+                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="general">General</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="border-t border-slate-100 px-10 py-7">
             <Button
               variant="outline"
               onClick={() => setShowAddMemberDialog(false)}
+              className="h-14 rounded-[18px] border-slate-200 px-8 text-lg"
             >
               Cancel
             </Button>
             <Button
               onClick={handleAddMember}
               disabled={addingMember}
-              className="bg-primary hover:bg-primary-hover"
+              className="h-14 rounded-[18px] bg-blue-600 px-8 text-lg font-semibold text-white hover:bg-blue-700 disabled:bg-slate-300"
               data-testid="confirm-add-member-btn"
             >
               {addingMember ? (

@@ -160,6 +160,8 @@ class NewBranchRequest(BaseModel):
 class BranchRequestResponse(BaseModel):
     id: str
     request_type: str
+    request_type_id: Optional[str] = None
+    request_type_name: Optional[str] = None
     category: Optional[str] = CATEGORY_GOOGLE_MAPS
     branch_name: str
     city: str
@@ -167,6 +169,8 @@ class BranchRequestResponse(BaseModel):
     phone_number: str
     notes: Optional[str] = ""
     photos: List[str] = []
+    field_values: dict = {}
+    custom_fields: List[dict] = []
     status: str
     assigned_to: Optional[str] = None
     assigned_to_name: Optional[str] = None
@@ -832,6 +836,11 @@ async def get_request(request_id: str, user = Depends(get_current_user)):
     # Check access for supervisors
     if user.get("role") == ROLE_SUPERVISOR and request.get("assigned_to") != user["id"]:
         raise HTTPException(status_code=403, detail="Access denied")
+
+    if request.get("request_type_id"):
+        request_type = await db.request_types.find_one({"id": request["request_type_id"]}, {"_id": 0})
+        if request_type:
+            request["custom_fields"] = request_type.get("custom_fields", [])
     
     return request
 
@@ -1116,11 +1125,13 @@ async def create_dynamic_request(data: DynamicRequestCreate):
         "request_type": "dynamic",
         "request_type_id": data.request_type_id,
         "request_type_name": request_type["name"],
+        "category": CATEGORY_GENERAL,
         "branch_name": data.field_values.get(list(data.field_values.keys())[0], request_type["name"]) if data.field_values else request_type["name"],
         "city": "N/A",
         "location_link": "",
         "phone_number": "",
         "notes": "",
+        "photos": [],
         "field_values": data.field_values,
         "status": "new",
         "assigned_to": request_type.get("assigned_to"),

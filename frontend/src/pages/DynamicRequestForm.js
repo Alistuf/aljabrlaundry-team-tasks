@@ -261,7 +261,9 @@ export default function DynamicRequestForm() {
             <Link to="/" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
-            <img src={LOGO_URL} alt="Aljabr Laundry" className="h-10 object-contain" />
+            <Link to="/" aria-label="Go to home page">
+              <img src={LOGO_URL} alt="Aljabr Laundry" className="h-10 object-contain" />
+            </Link>
             <div>
               <h1 className="font-heading text-lg font-bold">{requestType.name}</h1>
               <p className="text-xs text-gray-500">{requestType.description || 'Submit a request'}</p>

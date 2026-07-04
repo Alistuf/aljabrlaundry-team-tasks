@@ -43,6 +43,7 @@ export default function NewBranchForm() {
     location_link: '',
     phone_number: ''
   });
+  const isSubmitDisabled = loading || !formData.branch_name || !formData.city || !formData.location_link || !formData.phone_number || photos.length < 5;
 
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
@@ -139,64 +140,67 @@ export default function NewBranchForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="ltr">
+    <div className="app-shell" dir="ltr">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3">
+      <header className="app-topbar">
+        <div className="app-topbar-inner justify-start gap-8">
           <div className="flex items-center gap-4">
             <Link 
               to="/" 
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="icon-btn-soft"
               data-testid="back-btn"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="h-6 w-6" />
             </Link>
-            <img 
-              src={LOGO_URL} 
-              alt="Aljabr Laundry" 
-              className="h-10 object-contain"
-            />
+            <Link to="/" aria-label="Go to home page">
+              <img 
+                src={LOGO_URL} 
+                alt="Aljabr Laundry" 
+                className="app-logo"
+              />
+            </Link>
           </div>
         </div>
       </header>
 
       {/* Form */}
-      <main className="container mx-auto px-4 py-6 md:py-10">
-        <div className="max-w-lg mx-auto">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="text-center pb-2">
-              <div className="w-14 h-14 bg-secondary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-7 h-7 text-secondary" />
+      <main className="mx-auto max-w-[720px] px-6 py-16">
+        <div>
+          <Card className="glass-card overflow-hidden">
+            <CardHeader className="border-b border-slate-100 px-12 py-12 text-left">
+              <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[22px] bg-red-50">
+                <Plus className="h-10 w-10 text-red-600" />
               </div>
-              <CardTitle className="font-heading text-xl md:text-2xl">
+              <CardTitle className="font-heading text-4xl font-extrabold text-slate-950">
                 New Branch Listing Request
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="mt-4 text-xl leading-8 text-slate-500">
                 Please fill in the details and upload branch photos to register on Google Maps
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-5">
+            <CardContent className="px-12 py-10">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Branch Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="branch_name">Branch Name *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="branch_name" className="soft-label">Branch Name <span className="text-red-500">*</span></Label>
                   <Input
                     id="branch_name"
                     placeholder="e.g., Riyadh - Al Nakheel Branch"
                     value={formData.branch_name}
                     onChange={(e) => setFormData({ ...formData, branch_name: e.target.value })}
+                    className="soft-input"
                     data-testid="branch-name-input"
                   />
                 </div>
 
                 {/* City */}
-                <div className="space-y-2">
-                  <Label htmlFor="city">City *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="city" className="soft-label">City <span className="text-red-500">*</span></Label>
                   <Select 
                     value={formData.city} 
                     onValueChange={(value) => setFormData({ ...formData, city: value })}
                   >
-                    <SelectTrigger data-testid="city-select">
+                    <SelectTrigger className="soft-input" data-testid="city-select">
                       <SelectValue placeholder="Select City" />
                     </SelectTrigger>
                     <SelectContent>
@@ -210,45 +214,47 @@ export default function NewBranchForm() {
                 </div>
 
                 {/* Location Link */}
-                <div className="space-y-2">
-                  <Label htmlFor="location_link">Google Maps Location Link *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="location_link" className="soft-label">Google Maps Location Link <span className="text-red-500">*</span></Label>
                   <Input
                     id="location_link"
                     type="url"
                     placeholder="https://maps.google.com/... or coordinates"
                     value={formData.location_link}
                     onChange={(e) => setFormData({ ...formData, location_link: e.target.value })}
+                    className="soft-input"
                     data-testid="location-link-input"
                   />
                 </div>
 
                 {/* Phone Number */}
-                <div className="space-y-2">
-                  <Label htmlFor="phone_number">Branch Phone Number *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="phone_number" className="soft-label">Branch Phone Number <span className="text-red-500">*</span></Label>
                   <Input
                     id="phone_number"
                     type="tel"
                     placeholder="05xxxxxxxx"
                     value={formData.phone_number}
                     onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                    className="soft-input"
                     data-testid="phone-input"
                   />
                 </div>
 
                 {/* Photo Upload Section */}
-                <div className="space-y-3">
-                  <Label>Branch Photos * (minimum 5 photos)</Label>
+                <div className="space-y-5">
+                  <Label className="soft-label">Branch Photos <span className="text-red-500">*</span> <span className="font-normal text-slate-400">(minimum 5 photos)</span></Label>
                   
                   {/* Example Photos Guide */}
-                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-                    <p className="text-sm text-blue-800 font-medium mb-3">Required Photos:</p>
-                    <div className="grid grid-cols-5 gap-2">
+                  <div className="rounded-[18px] border border-blue-100 bg-blue-50 p-6">
+                    <p className="mb-5 text-base font-bold text-blue-700">Required Photos:</p>
+                    <div className="grid grid-cols-5 gap-3">
                       {EXAMPLE_PHOTOS.map((photo) => (
                         <div key={photo.label} className="text-center">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-1 text-lg">
+                          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-2xl">
                             {photo.icon}
                           </div>
-                          <span className="text-xs text-blue-700 leading-tight block">{photo.label}</span>
+                          <span className="block text-sm leading-tight text-blue-700">{photo.label}</span>
                         </div>
                       ))}
                     </div>
@@ -256,13 +262,13 @@ export default function NewBranchForm() {
 
                   {/* Upload Button */}
                   <div 
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-secondary transition-colors cursor-pointer"
+                    className="cursor-pointer rounded-[18px] border-2 border-dashed border-slate-300 bg-white p-10 text-center transition-colors hover:border-red-400"
                     onClick={() => fileInputRef.current?.click()}
                     data-testid="upload-area"
                   >
-                    <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm text-gray-600 mb-1">Click to upload photos</p>
-                    <p className="text-xs text-gray-400">PNG, JPG, JPEG</p>
+                    <Upload className="mx-auto mb-4 h-12 w-12 text-slate-400" />
+                    <p className="mb-2 text-lg font-semibold text-slate-700">Click to upload photos <span className="text-red-500">or drag & drop</span></p>
+                    <p className="text-sm text-slate-400">PNG, JPG, JPEG</p>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -306,8 +312,8 @@ export default function NewBranchForm() {
                 {/* Submit Button */}
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-secondary hover:bg-secondary-hover text-white text-base font-medium"
-                  disabled={loading}
+                  className={`mt-6 w-full ${isSubmitDisabled ? 'disabled-pill' : 'primary-pill bg-red-600 hover:bg-red-700'}`}
+                  disabled={isSubmitDisabled}
                   data-testid="submit-btn"
                 >
                   {loading ? (

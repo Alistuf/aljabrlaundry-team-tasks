@@ -85,11 +85,13 @@ export default function AdminLogin() {
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
-            <img 
-              src={LOGO_URL} 
-              alt="Aljabr Laundry" 
-              className="h-10 object-contain"
-            />
+            <Link to="/" aria-label="Go to home page">
+              <img 
+                src={LOGO_URL} 
+                alt="Aljabr Laundry" 
+                className="h-10 object-contain"
+              />
+            </Link>
           </div>
         </div>
       </header>

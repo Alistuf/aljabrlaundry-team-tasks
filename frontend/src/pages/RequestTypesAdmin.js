@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { 
   ArrowLeft, Plus, Trash2, Edit, Settings, GripVertical,
   FileText, Hash, Calendar, List, Upload, CheckSquare, ListChecks, Save, Users,
-  GitBranch, ArrowRight, Image, Loader2, X
+  GitBranch, ArrowRight, Image, Loader2, X, MapPin, Shield, Bell, User, TrendingUp
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
@@ -268,30 +268,105 @@ export default function RequestTypesAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="app-shell">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link to="/admin/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+      <header className="app-topbar">
+        <div className="app-topbar-inner">
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-6">
+              <Link to="/admin/dashboard" className="icon-btn-soft">
+                <ArrowLeft className="h-6 w-6" />
               </Link>
-              <img src={LOGO_URL} alt="Aljabr Laundry" className="h-10 object-contain" />
+              <Link to="/" aria-label="Go to home page">
+                <img src={LOGO_URL} alt="Aljabr Laundry" className="app-logo" />
+              </Link>
+              <div className="hidden h-12 w-px bg-slate-200 md:block" />
               <div>
-                <h1 className="font-heading text-lg font-bold">Manage Request Types</h1>
-                <p className="text-xs text-gray-500">Add request types with workflow steps</p>
+                <h1 className="font-heading text-2xl font-extrabold text-slate-950">Dashboard</h1>
+                <p className="text-base text-slate-400">Branch Management System</p>
               </div>
             </div>
-            <Button onClick={openCreateDialog} className="bg-blue-600 hover:bg-blue-700" data-testid="create-request-type-btn">
-              <Plus className="w-4 h-4 mr-2" />
-              New Request Type
-            </Button>
+            <div className="flex items-center gap-6">
+              <Badge className="hidden rounded-full border border-blue-200 bg-blue-50 px-6 py-3 text-base font-semibold text-blue-700 hover:bg-blue-50 md:flex">
+                <span className="h-3 w-3 rounded-full bg-blue-600" />
+                Manager
+              </Badge>
+              <Bell className="h-6 w-6 text-slate-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-lg font-bold text-white">
+                MA
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="mx-auto max-w-none px-10 py-10">
+        <div className="mb-10 inline-flex flex-wrap gap-2 rounded-[26px] border border-slate-200 bg-white p-3 shadow-[0_8px_18px_rgba(15,23,42,0.07)]">
+          <Button variant="outline" onClick={() => navigate('/admin/dashboard')} className="h-14 rounded-[18px] border-transparent bg-white px-7 text-xl font-semibold text-slate-500 shadow-none hover:bg-slate-50">
+            <MapPin className="h-6 w-6" />
+            Requests
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/admin/dashboard')} className="h-14 rounded-[18px] border-transparent bg-white px-7 text-xl font-semibold text-slate-500 shadow-none hover:bg-slate-50">
+            <GitBranch className="h-6 w-6" />
+            Workflow Requests
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/admin/dashboard')} className="h-14 rounded-[18px] border-transparent bg-white px-7 text-xl font-semibold text-slate-500 shadow-none hover:bg-slate-50">
+            <Users className="h-6 w-6" />
+            Team Management
+          </Button>
+          <Button className="h-14 rounded-[18px] bg-blue-600 px-7 text-xl font-semibold text-white shadow-none hover:bg-blue-700">
+            <FileText className="h-6 w-6" />
+            Request Types
+          </Button>
+        </div>
+
+        <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-4">
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">Total Requests</p>
+                <TrendingUp className="h-7 w-7 text-slate-300" />
+              </div>
+              <p className="text-5xl font-extrabold text-slate-950">{requestTypes.length}</p>
+            </CardContent>
+          </Card>
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">New Requests</p>
+                <TrendingUp className="h-7 w-7 text-blue-200" />
+              </div>
+              <p className="text-5xl font-extrabold text-blue-600">{requestTypes.filter(t => t.is_active).length}</p>
+              <p className="mt-4 text-base text-slate-400">Active request types</p>
+            </CardContent>
+          </Card>
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">In Progress</p>
+                <TrendingUp className="h-7 w-7 text-orange-200" />
+              </div>
+              <p className="text-5xl font-extrabold text-orange-500">0</p>
+            </CardContent>
+          </Card>
+          <Card className="metric-card">
+            <CardContent className="p-0">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-xl text-slate-500">Completed</p>
+                <TrendingUp className="h-7 w-7 text-emerald-200" />
+              </div>
+              <p className="text-5xl font-extrabold text-emerald-600">0</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="mb-6 flex justify-end">
+          <Button onClick={openCreateDialog} className="h-14 rounded-[18px] bg-blue-600 px-8 text-xl font-semibold text-white shadow-[0_10px_20px_rgba(37,99,235,0.22)] hover:bg-blue-700" data-testid="create-request-type-btn">
+            <Plus className="mr-2 h-6 w-6" />
+            New Request Type
+          </Button>
+        </div>
+
         {loading ? (
           <div className="text-center py-12">Loading...</div>
         ) : requestTypes.length === 0 ? (
@@ -307,14 +382,15 @@ export default function RequestTypesAdmin() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {requestTypes.map((type) => (
-              <Card key={type.id} className={`${!type.is_active ? 'opacity-60' : ''}`} data-testid={`request-type-card-${type.id}`}>
-                <CardHeader className="pb-2">
+              <Card key={type.id} className={`rounded-[24px] border-slate-200 bg-white shadow-[0_8px_18px_rgba(15,23,42,0.06)] ${!type.is_active ? 'opacity-60' : ''}`} data-testid={`request-type-card-${type.id}`}>
+                <CardHeader className="px-8 py-7">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <CardTitle className="text-lg">{type.name}</CardTitle>
-                      <Badge variant={type.is_active ? 'default' : 'secondary'}>
+                    <div className="space-y-5">
+                      <div className="flex items-center gap-5">
+                      <CardTitle className="font-heading text-3xl font-extrabold text-slate-950">{type.name}</CardTitle>
+                      <Badge className="rounded-full bg-blue-50 px-5 py-2 text-base font-bold text-blue-700 hover:bg-blue-50">
                         {type.is_active ? 'Active' : 'Inactive'}
                       </Badge>
                       {type.workflow_steps?.length > 0 && (
@@ -323,27 +399,31 @@ export default function RequestTypesAdmin() {
                           {type.workflow_steps.length} Steps
                         </Badge>
                       )}
+                      </div>
+                      <p className="text-xl text-slate-500">{type.description || 'No description'}</p>
+                      <div className="flex flex-wrap gap-8 text-lg text-slate-500">
+                        <span><strong>{type.custom_fields?.length || 0}</strong> Form Fields</span>
+                        <span className="flex items-center gap-2">
+                          <Users className="h-5 w-5" />
+                          Assigned to: <strong className="text-slate-700">{type.assigned_to_name || 'Unassigned'}</strong>
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-4">
                       <Switch
                         checked={type.is_active}
                         onCheckedChange={() => toggleActive(type)}
                       />
-                      <Button variant="outline" size="sm" onClick={() => openEditDialog(type)} data-testid={`edit-type-${type.id}`}>
-                        <Edit className="w-4 h-4" />
+                      <Button variant="outline" size="icon" className="h-12 w-12 rounded-[14px] border-slate-200" onClick={() => openEditDialog(type)} data-testid={`edit-type-${type.id}`}>
+                        <Edit className="h-5 w-5" />
                       </Button>
-                      <Button variant="outline" size="sm" className="text-red-600" onClick={() => handleDelete(type.id)} data-testid={`delete-type-${type.id}`}>
-                        <Trash2 className="w-4 h-4" />
+                      <Button variant="outline" size="icon" className="h-12 w-12 rounded-[14px] border-slate-200 text-red-500" onClick={() => handleDelete(type.id)} data-testid={`delete-type-${type.id}`}>
+                        <Trash2 className="h-5 w-5" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-500 mb-3">{type.description || 'No description'}</p>
-                  <div className="flex flex-wrap gap-4 text-sm">
-                    <span className="text-gray-600">
-                      <strong>{type.custom_fields?.length || 0}</strong> Form Fields
-                    </span>
+                <CardContent className="hidden">
                     {type.workflow_steps?.length > 0 ? (
                       <div className="flex items-center gap-1 text-indigo-600">
                         <GitBranch className="w-4 h-4" />
@@ -363,7 +443,6 @@ export default function RequestTypesAdmin() {
                         Assigned to: <strong>{type.assigned_to_name || 'Unassigned'}</strong>
                       </span>
                     )}
-                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -373,31 +452,32 @@ export default function RequestTypesAdmin() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingType ? 'Edit Request Type' : 'Create Request Type'}</DialogTitle>
+        <DialogContent className="max-h-[92vh] max-w-5xl overflow-hidden rounded-[24px] border-0 p-0 shadow-[0_26px_70px_rgba(15,23,42,0.28)]">
+          <DialogHeader className="border-b border-slate-100 px-10 py-6 text-left">
+            <DialogTitle className="font-heading text-3xl font-extrabold text-slate-950">{editingType ? 'Edit Request Type' : 'Create Request Type'}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 py-4">
+          <div className="max-h-[70vh] space-y-8 overflow-y-auto px-10 py-8">
             {/* Basic Info */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Name *</Label>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label className="soft-label">Name <span className="text-red-500">*</span></Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Marketing Material Request"
+                  className="soft-input"
                   data-testid="request-type-name-input"
                 />
               </div>
               {formData.workflow_steps.length === 0 && (
-                <div className="space-y-2">
-                  <Label>Assign to Team Member</Label>
+                <div className="space-y-3">
+                  <Label className="soft-label">Assign to Team Member</Label>
                   <Select
                     value={formData.assigned_to || "unassigned"}
                     onValueChange={(value) => setFormData(prev => ({ ...prev, assigned_to: value === "unassigned" ? "" : value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="soft-input">
                       <SelectValue placeholder="Select employee..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -413,19 +493,19 @@ export default function RequestTypesAdmin() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Description</Label>
+            <div className="space-y-3">
+              <Label className="soft-label">Description</Label>
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Describe what this request type is for..."
-                rows={2}
+                className="soft-textarea"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Card Image</Label>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <Label className="soft-label">Card Image</Label>
                 {formData.image_url ? (
                   <div className="relative group">
                     <img
@@ -443,13 +523,13 @@ export default function RequestTypesAdmin() {
                     </button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                  <label className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-[18px] border-2 border-dashed border-slate-300 transition-colors hover:border-blue-400 hover:bg-blue-50">
                     {uploadingImage ? (
-                      <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+                      <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
                     ) : (
                       <>
-                        <Image className="w-8 h-8 text-gray-400 mb-1" />
-                        <span className="text-xs text-gray-500">Click to upload image</span>
+                        <Image className="mb-4 h-10 w-10 text-slate-300" />
+                        <span className="text-lg text-slate-400">Click to upload image</span>
                       </>
                     )}
                     <input
@@ -463,34 +543,34 @@ export default function RequestTypesAdmin() {
                   </label>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <div className="flex items-center gap-2 pt-2">
+              <div className="space-y-3">
+                <Label className="soft-label">Status</Label>
+                <div className="flex items-center gap-5 pt-3">
                   <Switch
                     checked={formData.is_active}
                     onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
                   />
-                  <span className="text-sm">{formData.is_active ? 'Active (visible on Landing Page)' : 'Inactive'}</span>
+                  <span className="text-lg text-slate-500">{formData.is_active ? 'Active (visible on Landing Page)' : 'Inactive'}</span>
                 </div>
               </div>
             </div>
 
             {/* Custom Fields */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Form Fields</Label>
-                <Button type="button" variant="outline" size="sm" onClick={addCustomField} data-testid="add-field-btn">
-                  <Plus className="w-4 h-4 mr-1" />
+            <div className="overflow-hidden rounded-[18px] border border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+                <Label className="text-xl font-bold text-slate-700">Form Fields</Label>
+                <Button type="button" variant="outline" className="h-12 rounded-[14px] border-slate-200 px-5 text-base" onClick={addCustomField} data-testid="add-field-btn">
+                  <Plus className="mr-2 h-5 w-5" />
                   Add Field
                 </Button>
               </div>
 
               {formData.custom_fields.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center py-4 bg-gray-50 rounded-lg">
+                <p className="py-10 text-center text-lg text-slate-400">
                   No custom fields added yet. Add fields to create a form for this request type.
                 </p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-3 p-5">
                   {formData.custom_fields.map((field, index) => (
                     <Card key={field.id} className="p-3">
                       <div className="flex gap-3 items-start">
@@ -550,30 +630,29 @@ export default function RequestTypesAdmin() {
             </div>
 
             {/* Workflow Steps */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="overflow-hidden rounded-[18px] border border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
                 <div>
-                  <Label className="text-base font-semibold flex items-center gap-2">
-                    <GitBranch className="w-4 h-4 text-indigo-600" />
+                  <Label className="flex items-center gap-3 text-xl font-bold text-slate-700">
+                    <GitBranch className="h-5 w-5 text-blue-600" />
                     Workflow Steps
                   </Label>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="mt-1 text-sm text-slate-400">
                     Define the steps this request goes through. Each step is assigned to a team member.
                   </p>
                 </div>
-                <Button type="button" variant="outline" size="sm" onClick={addWorkflowStep} data-testid="add-step-btn">
-                  <Plus className="w-4 h-4 mr-1" />
+                <Button type="button" variant="outline" className="h-12 rounded-[14px] border-slate-200 px-5 text-base" onClick={addWorkflowStep} data-testid="add-step-btn">
+                  <Plus className="mr-2 h-5 w-5" />
                   Add Step
                 </Button>
               </div>
 
               {formData.workflow_steps.length === 0 ? (
-                <div className="text-sm text-gray-500 text-center py-4 bg-gray-50 rounded-lg">
+                <div className="py-10 text-center text-lg text-slate-400">
                   <p>No workflow steps. Request will be assigned directly to one person.</p>
-                  <p className="text-xs mt-1">Add steps to create a multi-step approval workflow.</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-3 p-5">
                   {formData.workflow_steps.map((step, index) => (
                     <Card key={step.id} className="p-4 border-l-4 border-l-indigo-500">
                       <div className="flex items-start gap-3">
@@ -649,9 +728,9 @@ export default function RequestTypesAdmin() {
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDialog(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} data-testid="save-request-type-btn">
+          <DialogFooter className="border-t border-slate-100 px-10 py-7">
+            <Button variant="outline" onClick={() => setShowDialog(false)} className="h-14 rounded-[18px] border-slate-200 px-8 text-lg">Cancel</Button>
+            <Button onClick={handleSave} disabled={saving} className="h-14 rounded-[18px] bg-blue-600 px-8 text-lg font-semibold text-white hover:bg-blue-700 disabled:bg-slate-300" data-testid="save-request-type-btn">
               {saving ? (
                 <>Saving...</>
               ) : (

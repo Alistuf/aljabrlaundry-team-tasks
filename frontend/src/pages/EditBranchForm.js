@@ -34,6 +34,7 @@ export default function EditBranchForm() {
     new_phone: '',
     notes: ''
   });
+  const isSubmitDisabled = loading || !formData.branch_name || !formData.city || !formData.google_maps_link || !formData.new_phone;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,64 +97,67 @@ export default function EditBranchForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="ltr">
+    <div className="app-shell" dir="ltr">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3">
+      <header className="app-topbar">
+        <div className="app-topbar-inner justify-start gap-8">
           <div className="flex items-center gap-4">
             <Link 
               to="/" 
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="icon-btn-soft"
               data-testid="back-btn"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="h-6 w-6" />
             </Link>
-            <img 
-              src={LOGO_URL} 
-              alt="Aljabr Laundry" 
-              className="h-10 object-contain"
-            />
+            <Link to="/" aria-label="Go to home page">
+              <img 
+                src={LOGO_URL} 
+                alt="Aljabr Laundry" 
+                className="app-logo"
+              />
+            </Link>
           </div>
         </div>
       </header>
 
       {/* Form */}
-      <main className="container mx-auto px-4 py-6 md:py-10">
-        <div className="max-w-lg mx-auto">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="text-center pb-2">
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-7 h-7 text-primary" />
+      <main className="mx-auto max-w-[760px] px-6 py-20">
+        <div>
+          <Card className="glass-card overflow-hidden">
+            <CardHeader className="border-b border-slate-100 px-12 py-12 text-left">
+              <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[22px] bg-blue-50">
+                <MapPin className="h-10 w-10 text-blue-600" />
               </div>
-              <CardTitle className="font-heading text-xl md:text-2xl">
+              <CardTitle className="font-heading text-4xl font-extrabold text-slate-950">
                 Edit Branch Information
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="mt-4 text-xl leading-8 text-slate-500">
                 Please fill in the required information to update the branch details
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-5">
+            <CardContent className="px-12 py-10">
+              <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Branch Name */}
-                <div className="space-y-2">
-                  <Label htmlFor="branch_name">Branch Name *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="branch_name" className="soft-label">Branch Name <span className="text-red-500">*</span></Label>
                   <Input
                     id="branch_name"
                     placeholder="e.g., Riyadh - Al Nakheel Branch"
                     value={formData.branch_name}
                     onChange={(e) => setFormData({ ...formData, branch_name: e.target.value })}
+                    className="soft-input"
                     data-testid="branch-name-input"
                   />
                 </div>
 
                 {/* City */}
-                <div className="space-y-2">
-                  <Label htmlFor="city">City *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="city" className="soft-label">City <span className="text-red-500">*</span></Label>
                   <Select 
                     value={formData.city} 
                     onValueChange={(value) => setFormData({ ...formData, city: value })}
                   >
-                    <SelectTrigger data-testid="city-select">
+                    <SelectTrigger className="soft-input" data-testid="city-select">
                       <SelectValue placeholder="Select City" />
                     </SelectTrigger>
                     <SelectContent>
@@ -167,40 +171,42 @@ export default function EditBranchForm() {
                 </div>
 
                 {/* Google Maps Link */}
-                <div className="space-y-2">
-                  <Label htmlFor="google_maps_link">Google Maps Link *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="google_maps_link" className="soft-label">Google Maps Link <span className="text-red-500">*</span></Label>
                   <Input
                     id="google_maps_link"
                     type="url"
                     placeholder="https://maps.google.com/..."
                     value={formData.google_maps_link}
                     onChange={(e) => setFormData({ ...formData, google_maps_link: e.target.value })}
+                    className="soft-input"
                     data-testid="maps-link-input"
                   />
                 </div>
 
                 {/* Phone Number */}
-                <div className="space-y-2">
-                  <Label htmlFor="new_phone">New Phone Number *</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="new_phone" className="soft-label">New Phone Number <span className="text-red-500">*</span></Label>
                   <Input
                     id="new_phone"
                     type="tel"
                     placeholder="05xxxxxxxx"
                     value={formData.new_phone}
                     onChange={(e) => setFormData({ ...formData, new_phone: e.target.value })}
+                    className="soft-input"
                     data-testid="phone-input"
                   />
                 </div>
 
                 {/* Notes */}
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Additional Notes</Label>
+                <div className="space-y-4">
+                  <Label htmlFor="notes" className="soft-label">Additional Notes</Label>
                   <Textarea
                     id="notes"
                     placeholder="Any additional details..."
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="min-h-[100px]"
+                    className="soft-textarea"
                     data-testid="notes-input"
                   />
                 </div>
@@ -208,8 +214,8 @@ export default function EditBranchForm() {
                 {/* Submit Button */}
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-primary hover:bg-primary-hover text-white text-base font-medium"
-                  disabled={loading}
+                  className={`mt-6 w-full ${isSubmitDisabled ? 'disabled-pill' : 'primary-pill'}`}
+                  disabled={isSubmitDisabled}
                   data-testid="submit-btn"
                 >
                   {loading ? (

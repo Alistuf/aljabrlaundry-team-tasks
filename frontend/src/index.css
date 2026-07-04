@@ -54,6 +54,60 @@ code {
     }
 }
 
+@layer components {
+    .app-shell {
+        @apply min-h-screen bg-[#f8fafc] text-slate-950;
+    }
+
+    .app-topbar {
+        @apply sticky top-0 z-20 border-b border-slate-200 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.08)];
+    }
+
+    .app-topbar-inner {
+        @apply mx-auto flex h-[86px] w-full max-w-none items-center justify-between px-8 md:px-14;
+    }
+
+    .app-logo {
+        @apply h-12 object-contain;
+    }
+
+    .icon-btn-soft {
+        @apply inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-950;
+    }
+
+    .glass-card {
+        @apply rounded-[28px] border border-slate-200 bg-white shadow-[0_16px_38px_rgba(15,23,42,0.08)];
+    }
+
+    .soft-input {
+        @apply h-14 rounded-[18px] border-slate-200 bg-slate-50 px-6 text-base text-slate-900 shadow-inner shadow-slate-200/30 placeholder:text-slate-400 focus-visible:ring-blue-500;
+    }
+
+    .soft-textarea {
+        @apply min-h-[118px] rounded-[18px] border-slate-200 bg-slate-50 px-6 py-4 text-base text-slate-900 shadow-inner shadow-slate-200/30 placeholder:text-slate-400 focus-visible:ring-blue-500;
+    }
+
+    .soft-label {
+        @apply text-base font-semibold text-slate-700;
+    }
+
+    .primary-pill {
+        @apply h-14 rounded-[18px] bg-blue-600 px-6 text-base font-semibold text-white shadow-[0_10px_20px_rgba(37,99,235,0.22)] transition hover:bg-blue-700;
+    }
+
+    .disabled-pill {
+        @apply h-14 rounded-[18px] bg-slate-300 px-6 text-base font-semibold text-white shadow-none;
+    }
+
+    .metric-card {
+        @apply rounded-[24px] border border-slate-200 bg-white p-7 shadow-[0_8px_18px_rgba(15,23,42,0.06)];
+    }
+
+    .modern-table-card {
+        @apply overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_8px_18px_rgba(15,23,42,0.06)];
+    }
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;

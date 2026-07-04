@@ -24,8 +24,9 @@ const STATUS_MAP = {
 };
 
 const REQUEST_TYPE_MAP = {
-  edit: { label: 'Edit Branch Information', color: 'bg-primary/10 text-primary', icon: MapPin },
-  new: { label: 'New Branch Listing', color: 'bg-secondary/10 text-secondary', icon: Plus }
+  edit: { label: 'Edit Branch Information', color: 'bg-primary/10 text-primary', icon: MapPin, bgColor: 'bg-primary/10', iconColor: 'text-primary' },
+  new: { label: 'New Branch Listing', color: 'bg-secondary/10 text-secondary', icon: Plus, bgColor: 'bg-secondary/10', iconColor: 'text-secondary' },
+  dynamic: { label: 'Custom Request', color: 'bg-purple-100 text-purple-800', icon: FileText, bgColor: 'bg-purple-100', iconColor: 'text-purple-700' }
 };
 
 export default function RequestDetail() {
@@ -126,6 +127,19 @@ export default function RequestDetail() {
     });
   };
 
+  const formatFieldValue = (value) => {
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+    if (value && typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+    return value || 'N/A';
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -138,10 +152,24 @@ export default function RequestDetail() {
     return null;
   }
 
-  const typeInfo = REQUEST_TYPE_MAP[request.request_type];
-  const statusInfo = STATUS_MAP[request.status];
+  const typeInfo = REQUEST_TYPE_MAP[request.request_type] || REQUEST_TYPE_MAP.dynamic;
+  const statusInfo = STATUS_MAP[request.status] || STATUS_MAP.new;
   const StatusIcon = statusInfo.icon;
   const TypeIcon = typeInfo.icon;
+  const customFieldLabels = (request.custom_fields || []).reduce((labels, field) => {
+    labels[field.id] = field.name;
+    return labels;
+  }, {});
+  const customFieldEntries = Object.entries(request.field_values || request.custom_field_values || {})
+    .filter(([, value]) => value !== undefined && value !== null && value !== '')
+    .map(([field, value]) => ({
+      id: field,
+      label: customFieldLabels[field] || field,
+      value
+    }));
+  const hasCity = request.city && request.city !== 'N/A';
+  const hasPhone = Boolean(request.phone_number);
+  const hasLocation = Boolean(request.location_link);
 
   return (
     <div className="min-h-screen bg-gray-50" dir="ltr">
@@ -156,11 +184,13 @@ export default function RequestDetail() {
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
-            <img 
-              src={LOGO_URL} 
-              alt="Aljabr Laundry" 
-              className="h-10 object-contain"
-            />
+            <Link to="/" aria-label="Go to home page">
+              <img 
+                src={LOGO_URL} 
+                alt="Aljabr Laundry" 
+                className="h-10 object-contain"
+              />
+            </Link>
             <span className="text-gray-400">|</span>
             <span className="text-sm text-gray-600">Request Details</span>
           </div>
@@ -175,12 +205,12 @@ export default function RequestDetail() {
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${request.request_type === 'edit' ? 'bg-primary/10' : 'bg-secondary/10'}`}>
-                    <TypeIcon className={`w-7 h-7 ${request.request_type === 'edit' ? 'text-primary' : 'text-secondary'}`} />
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${typeInfo.bgColor}`}>
+                    <TypeIcon className={`w-7 h-7 ${typeInfo.iconColor}`} />
                   </div>
                   <div>
                     <Badge variant="outline" className={typeInfo.color}>
-                      {typeInfo.label}
+                      {request.request_type_name || typeInfo.label}
                     </Badge>
                     <h1 className="font-heading text-xl md:text-2xl font-bold text-gray-900 mt-1">
                       {request.branch_name}
@@ -231,47 +261,53 @@ export default function RequestDetail() {
                 <CardTitle className="text-lg font-heading">Request Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500">City</p>
-                    <p className="font-medium">{request.city}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-gray-500">Phone Number</p>
-                    <p className="font-medium">{request.phone_number}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <LinkIcon className="w-5 h-5 text-gray-400 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-500">Google Maps Link</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <a 
-                        href={request.location_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline text-sm truncate max-w-[200px]"
-                      >
-                        {request.location_link}
-                      </a>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={copyLink}
-                        className="shrink-0"
-                        data-testid="copy-link-btn"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
+                {hasCity && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-gray-500">City</p>
+                      <p className="font-medium">{request.city}</p>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {hasPhone && (
+                  <div className="flex items-start gap-3">
+                    <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-gray-500">Phone Number</p>
+                      <p className="font-medium">{request.phone_number}</p>
+                    </div>
+                  </div>
+                )}
+
+                {hasLocation && (
+                  <div className="flex items-start gap-3">
+                    <LinkIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-500">Google Maps Link</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <a 
+                          href={request.location_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline text-sm truncate max-w-[200px]"
+                        >
+                          {request.location_link}
+                        </a>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={copyLink}
+                          className="shrink-0"
+                          data-testid="copy-link-btn"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {request.notes && (
                   <div className="flex items-start gap-3">
@@ -281,6 +317,10 @@ export default function RequestDetail() {
                       <p className="text-gray-700">{request.notes}</p>
                     </div>
                   </div>
+                )}
+
+                {!hasCity && !hasPhone && !hasLocation && !request.notes && (
+                  <p className="text-sm text-gray-500">Request details are shown in the submitted fields below.</p>
                 )}
               </CardContent>
             </Card>
@@ -361,6 +401,29 @@ export default function RequestDetail() {
               </CardContent>
             </Card>
           </div>
+
+          {customFieldEntries.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-heading flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Submitted Fields
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {customFieldEntries.map((field) => (
+                    <div key={field.id} className="rounded-lg border bg-gray-50 p-4">
+                      <p className="text-sm text-gray-500">{field.label}</p>
+                      <p className="font-medium text-gray-900 break-words mt-1">
+                        {formatFieldValue(field.value)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Photos Section (for new branch requests) */}
           {request.request_type === 'new' && request.photos && request.photos.length > 0 && (
