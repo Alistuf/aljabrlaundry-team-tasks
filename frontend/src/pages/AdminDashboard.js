@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { 
   LogOut, Bell, Search, MapPin, Plus, Users, UserPlus, Settings,
   Clock, CheckCircle2, Loader2, RefreshCw, Eye, Shield, User, Trash2, AlertCircle,
-  FileText, GitBranch, ArrowRight, ArrowLeft, ChevronDown, TrendingUp, MoreHorizontal, Filter
+  FileText, GitBranch, ArrowRight, ArrowLeft, ChevronDown, TrendingUp, Filter, Edit
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth, ROLE_MANAGER, ROLE_SUPERVISOR } from '@/context/AuthContext';
@@ -58,8 +58,15 @@ export default function AdminDashboard() {
   
   // Team management state
   const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
+  const [showEditMemberDialog, setShowEditMemberDialog] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [addingMember, setAddingMember] = useState(false);
+  const [updatingMember, setUpdatingMember] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
+  const [editMemberForm, setEditMemberForm] = useState({
+    role: ROLE_SUPERVISOR,
+    category: 'google_maps'
+  });
   const [newMember, setNewMember] = useState({
     username: '',
     email: '',
@@ -187,6 +194,42 @@ export default function AdminDashboard() {
       toast.error(error.response?.data?.detail || 'Failed to add team member');
     } finally {
       setAddingMember(false);
+    }
+  };
+
+  const openEditMemberDialog = (member) => {
+    setEditingMember(member);
+    setEditMemberForm({
+      role: member.role || ROLE_SUPERVISOR,
+      category: member.category || 'google_maps'
+    });
+    setShowEditMemberDialog(true);
+  };
+
+  const handleUpdateMember = async () => {
+    if (!editingMember) return;
+
+    if (editingMember.id === user?.id && editMemberForm.role !== ROLE_MANAGER) {
+      if (!window.confirm('You are changing your own role from Manager. You may lose access to this page. Continue?')) {
+        return;
+      }
+    }
+
+    setUpdatingMember(true);
+    try {
+      const payload = {
+        role: editMemberForm.role,
+        category: editMemberForm.role === ROLE_SUPERVISOR ? editMemberForm.category : 'general'
+      };
+      await axios.patch(`${API}/users/${editingMember.id}`, payload, authHeaders);
+      toast.success('Team member role updated successfully');
+      setShowEditMemberDialog(false);
+      setEditingMember(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update team member');
+    } finally {
+      setUpdatingMember(false);
     }
   };
 
@@ -1006,20 +1049,28 @@ export default function AdminDashboard() {
                             {member.category?.replace('_', ' ') || 'N/A'}
                           </td>
                           <td className="px-8 py-7">
-                            {member.id !== user?.id && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                className="h-11 rounded-[14px] border-slate-200 text-red-600 hover:bg-red-50"
-                                onClick={() => deleteUser(member.id)}
-                                data-testid={`delete-member-${member.id}`}
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-11 w-11 rounded-[14px] border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+                                onClick={() => openEditMemberDialog(member)}
+                                data-testid={`edit-member-${member.id}`}
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Edit className="h-4 w-4" />
                               </Button>
-                            )}
-                            {member.id === user?.id && (
-                              <MoreHorizontal className="h-6 w-6 text-slate-400" />
-                            )}
+                              {member.id !== user?.id && (
+                                <Button 
+                                  variant="outline" 
+                                  size="icon"
+                                  className="h-11 w-11 rounded-[14px] border-slate-200 text-red-600 hover:bg-red-50"
+                                  onClick={() => deleteUser(member.id)}
+                                  data-testid={`delete-member-${member.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1134,6 +1185,92 @@ export default function AdminDashboard() {
                 </>
               ) : (
                 'Add Member'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Member Dialog */}
+      <Dialog open={showEditMemberDialog} onOpenChange={setShowEditMemberDialog}>
+        <DialogContent className="overflow-hidden rounded-[28px] border-0 p-0 shadow-[0_26px_70px_rgba(15,23,42,0.24)] sm:max-w-2xl">
+          <DialogHeader className="border-b border-slate-100 px-10 py-8 text-left">
+            <DialogTitle className="font-heading text-3xl font-extrabold text-slate-950">
+              Edit Team Member
+            </DialogTitle>
+            <p className="text-lg text-slate-400">
+              {editingMember ? `Update role for ${editingMember.name || editingMember.username}` : 'Update member permissions'}
+            </p>
+          </DialogHeader>
+          <div className="space-y-7 px-10 py-8">
+            <div className="rounded-[18px] bg-slate-50 p-5">
+              <p className="text-sm font-bold uppercase tracking-wide text-slate-400">Member</p>
+              <p className="mt-2 text-xl font-bold text-slate-950">
+                {editingMember?.name || editingMember?.username}
+              </p>
+              <p className="mt-1 text-lg text-slate-500">{editingMember?.email}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-5">
+              <div className="space-y-3">
+                <Label className="soft-label">Role</Label>
+                <Select
+                  value={editMemberForm.role}
+                  onValueChange={(value) => setEditMemberForm(prev => ({
+                    ...prev,
+                    role: value,
+                    category: value === ROLE_MANAGER ? 'general' : prev.category || 'google_maps'
+                  }))}
+                >
+                  <SelectTrigger className="soft-input" data-testid="edit-member-role">
+                    <SelectValue placeholder="Select Role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ROLE_MANAGER}>Manager</SelectItem>
+                    <SelectItem value={ROLE_SUPERVISOR}>Supervisor</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {editMemberForm.role === ROLE_SUPERVISOR && (
+                <div className="space-y-3">
+                  <Label className="soft-label">Department</Label>
+                  <Select
+                    value={editMemberForm.category}
+                    onValueChange={(value) => setEditMemberForm(prev => ({ ...prev, category: value }))}
+                  >
+                    <SelectTrigger className="soft-input" data-testid="edit-member-category">
+                      <SelectValue placeholder="Select Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="google_maps">Google Maps</SelectItem>
+                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="general">General</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="border-t border-slate-100 px-10 py-7">
+            <Button
+              variant="outline"
+              onClick={() => setShowEditMemberDialog(false)}
+              className="h-14 rounded-[18px] border-slate-200 px-8 text-lg"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateMember}
+              disabled={updatingMember}
+              className="h-14 rounded-[18px] bg-blue-600 px-8 text-lg font-semibold text-white hover:bg-blue-700 disabled:bg-slate-300"
+              data-testid="confirm-edit-member-btn"
+            >
+              {updatingMember ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Changes'
               )}
             </Button>
           </DialogFooter>
